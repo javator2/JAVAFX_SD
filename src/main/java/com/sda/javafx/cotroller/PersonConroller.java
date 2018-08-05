@@ -5,6 +5,8 @@ import com.sda.javafx.model.Person;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import java.io.IOException;
+
 
 public class PersonConroller {
 
@@ -34,6 +36,18 @@ public class PersonConroller {
 
     @FXML
     private Button newButton;
+
+    @FXML
+    public void handleSaveAS() throws IOException {
+        main.saveAS();
+
+    }
+
+    @FXML
+    public void handleSaveList() throws IOException {
+        main.saveList();
+
+    }
 
     @FXML
     public void handleNewPerson(){

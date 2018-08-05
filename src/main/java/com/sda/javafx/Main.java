@@ -2,6 +2,7 @@ package com.sda.javafx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sda.javafx.cotroller.PersonConroller;
+import com.sda.javafx.cotroller.PersonCreater;
 import com.sda.javafx.cotroller.PersonDetalis;
 import com.sda.javafx.model.Person;
 import com.sda.javafx.model.PersonJSON;
@@ -11,14 +12,18 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main extends Application  {
+public class Main extends Application {
 
     private Stage stage;
     private VBox layout;
@@ -28,18 +33,19 @@ public class Main extends Application  {
 
 
     public Main() throws IOException {
-        personJSONList.add(new PersonJSON("Jan", "Kowalski"));
+       /* personJSONList.add(new PersonJSON("Jan", "Kowalski"));
         personJSONList.add(new PersonJSON("Franek", "Lewandowski"));
         personJSONList.add(new PersonJSON("Zbychu", "Dzik"));
         personJSONList.add(new PersonJSON("Marian", "Zysk"));
         personJSONList.add(new PersonJSON("Jan", "Kowalski"));
         personJSONList.add(new PersonJSON("Jan", "Kowalski"));
+*/
 
 
         ObjectMapper mapper = new ObjectMapper();
-        File filename = new File("person.json");
-        filename.createNewFile();
-        mapper.writeValue(filename, personJSONList);
+        // File filename = new File("person.json");
+        // filename.createNewFile();
+        // mapper.writeValue(filename, personJSONList);
 
 
         PersonJSON[] readorders = mapper.readValue(new File("person.json"), PersonJSON[].class);
@@ -50,8 +56,6 @@ public class Main extends Application  {
 
         }
     }
-
-
 
 
     public Stage getStage() {
@@ -75,16 +79,16 @@ public class Main extends Application  {
 
     }
 
-    public void loadView(){
+    public void loadView() {
         try {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(Main.class.getResource("/okienko.fxml"));
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Main.class.getResource("/okienko.fxml"));
 
-        layout = (VBox)loader.load();
+            layout = (VBox) loader.load();
 
-        Scene scene = new Scene(layout);
-        stage.setScene(scene);
-        stage.show();
+            Scene scene = new Scene(layout);
+            stage.setScene(scene);
+            stage.show();
 
             PersonConroller conroller = loader.getController();
             conroller.setMain(this);
@@ -94,15 +98,24 @@ public class Main extends Application  {
         }
     }
 
-    public void loadNewPerson(){
+    public void loadNewPerson() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("/NewPerson.fxml"));
 
-            VBox window = (VBox)loader.load();
-
+            VBox window = (VBox) loader.load();
             Stage editStage = new Stage();
             editStage.setTitle("Nowy pracownik");
+
+            PersonCreater personCreater = loader.getController();
+
+            Person person = new Person("","");
+            personCreater.setStage(editStage);
+            personCreater.createPerson(person);
+            personList.add(person);
+
+
+
             Scene scene = new Scene(window);
             editStage.setScene(scene);
             editStage.show();
@@ -112,14 +125,15 @@ public class Main extends Application  {
         }
 
     }
-    public void loadPersonEdit(Person person){
+
+    public void loadPersonEdit(Person person) {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("/personedit.fxml"));
 
-            VBox window = (VBox)loader.load();
+            VBox window = (VBox) loader.load();
 
-            PersonDetalis personDetalis =loader.getController();
+            PersonDetalis personDetalis = loader.getController();
             personDetalis.setPerson(person);
 
             Stage editStage = new Stage();
@@ -136,8 +150,39 @@ public class Main extends Application  {
         }
     }
 
-    public void loadDeletePerson(Person person){
+    public void saveList() throws IOException {
 
+        List<PersonJSON> newPersonList = new ArrayList<PersonJSON>();
+
+        for (Person p : personList) {
+            System.out.println(p.getName());
+            newPersonList.add(new PersonJSON(p.getName(), p.getLasname()));
+
+        }
+        ObjectMapper maper = new ObjectMapper();
+        FileWriter fileWriter = new FileWriter("person.json");
+        maper.writeValue(fileWriter, newPersonList);
     }
 
-}
+    public void saveAS() throws IOException {
+        List<PersonJSON> newPersonList = new ArrayList<PersonJSON>();
+
+        for (Person p : personList) {
+            System.out.println(p.getName());
+            newPersonList.add(new PersonJSON(p.getName(), p.getLasname()));
+
+        }
+        ObjectMapper maper = new ObjectMapper();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Zapisz liste");
+        File newFile = fileChooser.showSaveDialog(stage).getAbsoluteFile();
+
+       maper.writeValue(newFile, newPersonList);
+    }
+
+        public void loadDeletePerson (Person person){
+
+
+        }
+
+    }
